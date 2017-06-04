@@ -1,0 +1,24 @@
+{
+    "name": "pac/graphql-package",
+    "type": "library",
+    "description": "PAC GraqhQL package",
+    "keywords": ["GraphQl"],
+    "license": "MIT",
+    "require": {
+        "pac/pac": "dev-master",
+        "php": ">=7.1"
+        "youshido/graphql": "2.0.x-dev",
+    },
+    "require-dev": {
+        "codeception/codeception": "^2.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pac\\GraphQLPackage\\": "src/",
+            "Test\\Unit\\": "tests/unit",
+            "Test\\Functional\\": "tests/functional",
+            "Test\\Acceptance\\": "tests/acceptance",
+            "Fixtures\\": "tests/_data/fixtures"
+        }
+    }
+}
