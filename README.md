@@ -1,1 +1,8 @@
-# graphql-package
+# GraphQL package
+
+## Configuration
+```yaml
+
+
+```
+
