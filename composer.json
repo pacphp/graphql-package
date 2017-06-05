@@ -5,16 +5,19 @@
     "keywords": ["GraphQl"],
     "license": "MIT",
     "require": {
+        "http-interop/http-factory-diactoros": "^0.2.0",
+        "http-interop/http-middleware": "dev-master",
         "pac/pac": "dev-master",
         "php": ">=7.1",
-        "youshido/graphql": "2.0.x-dev"
+        "youshido/graphql": "2.0.x-dev",
+        "zendframework/zend-diactoros": "^1.3"
     },
     "require-dev": {
         "codeception/codeception": "^2.2"
     },
     "autoload": {
         "psr-4": {
-            "Pac\\GraphQLPackage\\": "src/",
+            "Pac\\GraphQL\\": "src/",
             "Test\\Unit\\": "tests/unit",
             "Test\\Functional\\": "tests/functional",
             "Test\\Acceptance\\": "tests/acceptance",
