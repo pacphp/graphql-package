@@ -16,11 +16,23 @@ class Iso8601Type extends AbstractScalarType
 
     public function isValidValue($value)
     {
-        return $value ? true : false;
+        if ((is_object($value) && $value instanceof \DateTime) || empty($value)) {
+            return true;
+        } else if (is_string($value)) {
+            $date = $this->createFromFormat($value);
+        } else {
+            $date = null;
+        }
+
+        return $date ? true : false;
     }
 
     public function serialize($value)
     {
+        if (empty($value)) {
+            return null;
+        }
+
         if ($carbon = self::parseCarbon($value)) {
             return $carbon->toIso8601String();
         }
