@@ -9,6 +9,7 @@ use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Pac\Middleware\IdentityMiddleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use Youshido\GraphQL\Execution\Container\Container;
 use Youshido\GraphQL\Execution\Context\ExecutionContext;
 use Youshido\GraphQL\Execution\Processor;
@@ -17,10 +18,15 @@ use Zend\Diactoros\Response\JsonResponse;
 
 class GraphQLMiddleware implements MiddlewareInterface
 {
+    /** @var LoggerInterface */
+    protected $logger;
+    /** @var AbstractSchema */
     protected $schema;
 
-    public function __construct(AbstractSchema $schema)
+    public function __construct(AbstractSchema $schema, LoggerInterface $logger = null, bool $debug = false)
     {
+        $this->debug = $debug;
+        $this->logger = $logger;
         $this->schema = $schema;
     }
 
@@ -42,6 +48,16 @@ class GraphQLMiddleware implements MiddlewareInterface
                 'variables' => null,
             ];
 
+            if ($this->logger && $this->debug) {
+                $this->logger->info('GraphQL');
+                $this->logger->info('=======');
+                $this->logger->info('Query');
+                $this->logger->info(json_encode($content['query']));
+                $this->logger->info('Variables');
+                $this->logger->info(json_encode($content['variables']));
+                $this->logger->info('=======');
+            }
+
             $container = (new Container())
                 ->set('user', $request->getAttribute(IdentityMiddleware::IDENTITY_ATTRIBUTE));
             $context = (new ExecutionContext($this->schema))
@@ -56,6 +72,9 @@ class GraphQLMiddleware implements MiddlewareInterface
                     'message' => $e->getMessage(),
                 ],
             ];
+            if ($this->logger) {
+                $this->logger->error($e->getMessage());
+            }
         }
 
         $response = new JsonResponse($result);
