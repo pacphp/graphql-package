@@ -18,6 +18,7 @@ use Zend\Diactoros\Response\JsonResponse;
 
 class GraphQLMiddleware implements MiddlewareInterface
 {
+    protected $debug;
     /** @var LoggerInterface */
     protected $logger;
     /** @var AbstractSchema */
@@ -58,11 +59,7 @@ class GraphQLMiddleware implements MiddlewareInterface
                 $this->logger->info('=======');
             }
 
-            $container = (new Container())
-                ->set('user', $request->getAttribute(IdentityMiddleware::IDENTITY_ATTRIBUTE));
-            $context = (new ExecutionContext($this->schema))
-                ->setContainer($container);
-            $result = (new Processor($context))
+            $result = (new Processor($this->schema))
                 ->processPayload($content['query'], $content['variables'])
                 ->getResponseData();
 
