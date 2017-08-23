@@ -82,6 +82,7 @@ class GraphQLMiddleware implements MiddlewareInterface
             foreach ($content as $key => $json) {
                 $content[$key] = json_decode($json, true);
             }
+            $content['variables'] += $request->getUploadedFiles();
         }
 
         $content += [
