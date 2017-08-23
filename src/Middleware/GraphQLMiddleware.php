@@ -43,11 +43,7 @@ class GraphQLMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
         try {
-            $content = json_decode($request->getBody()->getContents(), true);
-            $content += [
-                'query'     => null,
-                'variables' => null,
-            ];
+            $content = $this->extractContentFromRequest($request);
 
             if ($this->logger && $this->debug) {
                 $this->logger->info('GraphQL');
@@ -77,5 +73,22 @@ class GraphQLMiddleware implements MiddlewareInterface
         $response = new JsonResponse($result);
 
         return $response;
+    }
+
+    protected function extractContentFromRequest(ServerRequestInterface $request): array
+    {
+        if (!$content = json_decode($request->getBody()->getContents(), true)) {
+            $content = $request->getParsedBody();
+            foreach ($content as $key => $json) {
+                $content[$key] = json_decode($json, true);
+            }
+        }
+
+        $content += [
+            'query'     => null,
+            'variables' => null,
+        ];
+
+        return $content;
     }
 }
