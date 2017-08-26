@@ -7,22 +7,25 @@
     "require": {
         "http-interop/http-factory-diactoros": "^0.2.0",
         "http-interop/http-middleware": "dev-master",
+        "league/flysystem": "^1.0",
         "pac/pac": "dev-master",
         "php": ">=7.1",
+        "ramsey/uuid": "^3.7.0",
         "youshido/graphql": "dev-master",
         "zendframework/zend-diactoros": "^1.3"
     },
     "require-dev": {
         "codeception/aspect-mock": "^2.0",
-        "codeception/codeception": "^2.2"
+        "codeception/codeception": "^2.2",
+        "league/flysystem-memory": "^1.0"
     },
     "autoload": {
         "psr-4": {
+            "Fixture\\": "tests/_data/fixture",
             "Pac\\GraphQL\\": "src/",
             "Test\\Unit\\": "tests/unit",
             "Test\\Functional\\": "tests/functional",
-            "Test\\Acceptance\\": "tests/acceptance",
-            "Fixtures\\": "tests/_data/fixtures"
+            "Test\\Acceptance\\": "tests/acceptance"
         }
     }
 }
