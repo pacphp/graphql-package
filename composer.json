@@ -6,7 +6,7 @@
     "license": "MIT",
     "require": {
         "http-interop/http-factory-diactoros": "^0.2.0",
-        "http-interop/http-middleware": "dev-master",
+        "http-interop/http-middleware": "^0.5.0",
         "league/flysystem": "^1.0",
         "pac/pac": "dev-master",
         "php": ">=7.1",
