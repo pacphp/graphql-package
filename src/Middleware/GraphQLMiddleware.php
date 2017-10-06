@@ -15,14 +15,16 @@ use Zend\Diactoros\Response\JsonResponse;
 class GraphQLMiddleware implements MiddlewareInterface
 {
     protected $debug;
+    protected $contextServices;
     /** @var LoggerInterface */
     protected $logger;
     /** @var AbstractSchema */
     protected $schema;
 
-    public function __construct(AbstractSchema $schema, LoggerInterface $logger = null, bool $debug = false)
+    public function __construct(AbstractSchema $schema, array $contextServices = [], LoggerInterface $logger = null, bool $debug = false)
     {
         $this->debug = $debug;
+        $this->contextServices = $contextServices;
         $this->logger = $logger;
         $this->schema = $schema;
     }
@@ -46,7 +48,9 @@ class GraphQLMiddleware implements MiddlewareInterface
                 $this->logger->info('=======');
             }
 
-            $result = (new Processor($this->schema))
+            $processor = new Processor($this->schema);
+            $this->injectServicesInContext($processor);
+            $result = $processor
                 ->processPayload($content['query'], $content['variables'])
                 ->getResponseData();
 
@@ -83,4 +87,13 @@ class GraphQLMiddleware implements MiddlewareInterface
 
         return $content;
     }
+
+    protected function injectServicesInContext(Processor $processor)
+    {
+        $container = $processor->getExecutionContext()->getContainer();
+        foreach ($this->contextServices as $id => $service) {
+            $container->set($id, $service);
+        }
+    }
+
 }

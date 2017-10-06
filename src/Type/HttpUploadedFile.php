@@ -3,14 +3,16 @@ declare(strict_types=1);
 
 namespace Pac\GraphQL\Type;
 
+use Http\Factory\Diactoros\UploadedFileFactory;
 use Pac\GraphQL\Entity\FileInterface;
+use Psr\Http\Message\UploadedFileInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
-use Youshido\GraphQL\Type\Object\AbstractObjectType;
+use Youshido\GraphQL\Type\InputObject\AbstractInputObjectType;
 use Youshido\GraphQL\Type\Scalar\IdType;
 use Youshido\GraphQL\Type\Scalar\IntType;
 use Youshido\GraphQL\Type\Scalar\StringType;
 
-class FileType extends AbstractDomainType
+class HttpUploadedFile extends AbstractInputObjectType
 {
     public function build($config)
     {
@@ -30,14 +32,22 @@ class FileType extends AbstractDomainType
             ],
         ]);
     }
+//
+//    public function parseValue($value)
+//    {
+//        return (new UploadedFileFactory())
+//            ->createUploadedFile(
+//
+//            );
+//    }
 
-    public function getId()
-    {
-        return $this->properties['id'];
-    }
 
-    public function getName()
+    public function isValidValue($value)
     {
-        return 'File';
+        if (! $value instanceof UploadedFileInterface) {
+            return false;
+        }
+
+        return true;
     }
 }

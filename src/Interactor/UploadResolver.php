@@ -5,20 +5,42 @@ namespace Pac\GraphQL\Interactor;
 
 use DateTime;
 use Pac\GraphQL\Entity\File;
+use Pac\GraphQL\Type\FileType;
 use Psr\Http\Message\UploadedFileInterface;
 use Ramsey\Uuid\Uuid;
 
 class UploadResolver
 {
-    /** @var  Uploader */
+    /** @var string */
+    private $fileTypeClass;
+    /** @var Uploader */
     private $imageUploader;
-    /** @var  Uploader */
+    /** @var Uploader */
     private $fileUploader;
 
     public function __construct(Uploader $fileUploader, Uploader $imageUploader = null)
     {
+        $this->fileUploader = $fileUploader;
         $this->imageUploader = $imageUploader;
-        $this->fileUploader  = $fileUploader;
+    }
+
+    public function resolveToArray(UploadedFileInterface $uploadedFile, array $properties = []): array
+    {
+        $id = $properties['id'] ?? null;
+        $filename = $this->storeFile($uploadedFile, $id);
+        $fileParts = pathinfo($uploadedFile->getClientFilename());
+
+        return
+            [
+                'extension'  => $fileParts['extension'],
+                'filename'   => $filename,
+                'id'         => $id,
+                'label'      => $fileParts['filename'],
+                'mimeType'   => $uploadedFile->getClientMediaType(),
+                'path'       => $fileParts['dirname'],
+                'size'       => $uploadedFile->getSize(),
+                'uploadedAt' => new DateTime(),
+            ] + $properties;
     }
 
     /**
@@ -33,7 +55,7 @@ class UploadResolver
     {
         $id = Uuid::uuid4()->getHex();
         $filename = $id . '.' . $uploadedFile->getClientFilename();
-        if (!$this->fileUploader->upload($filename, $uploadedFile->getStream())) {
+        if (! $this->fileUploader->upload($filename, $uploadedFile->getStream())) {
 
         }
 
@@ -79,5 +101,16 @@ class UploadResolver
     public function resolveUploadFile(string $requestField)
     {
         return $this->fileUploader->uploadFromUploadedFile($this->getRequestFile($requestField));
+    }
+
+    private function storeFile(UploadedFileInterface $uploadedFile, string $id = null): string
+    {
+        $id = $id !== null ? $id : Uuid::uuid4()->getHex();
+        $filename = $id . '.' . $uploadedFile->getClientFilename();
+        if (! $this->fileUploader->upload($filename, $uploadedFile->getStream())) {
+
+        }
+
+        return $filename;
     }
 }
