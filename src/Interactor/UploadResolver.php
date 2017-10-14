@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Pac\GraphQL\Interactor;
 
+use Carbon\Carbon;
 use DateTime;
 use Pac\GraphQL\Entity\File;
 use Pac\GraphQL\Type\FileType;
@@ -26,21 +27,23 @@ class UploadResolver
 
     public function resolveToArray(UploadedFileInterface $uploadedFile, array $properties = []): array
     {
-        $id = $properties['id'] ?? null;
-        $filename = $this->storeFile($uploadedFile, $id);
+        $properties['id'] = $properties['id'] ?? Uuid::uuid4()->getHex();
+        $filename = $this->storeFile($uploadedFile, $properties['id']);
         $fileParts = pathinfo($uploadedFile->getClientFilename());
 
-        return
+        $now = (new Carbon())->toDateTimeString();
+        $properties['date'] = $properties['date'] ?? $now;
+        $properties['uploadedAt'] = $properties['uploadedAt'] ?? $now;
+
+        return $properties +
             [
                 'extension'  => $fileParts['extension'],
                 'filename'   => $filename,
-                'id'         => $id,
-                'label'      => $fileParts['filename'],
+                'label'      => $fileParts['basename'],
                 'mimeType'   => $uploadedFile->getClientMediaType(),
                 'path'       => $fileParts['dirname'],
                 'size'       => $uploadedFile->getSize(),
-                'uploadedAt' => new DateTime(),
-            ] + $properties;
+            ];
     }
 
     /**

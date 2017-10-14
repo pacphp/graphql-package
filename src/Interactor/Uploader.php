@@ -17,6 +17,6 @@ class Uploader
 
     public function upload(string $filename, StreamInterface $stream): bool
     {
-        return $this->fileSystem->write($filename, $stream);
+        return $this->fileSystem->write($filename, $stream->getContents());
     }
 }
