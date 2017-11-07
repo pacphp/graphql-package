@@ -8,6 +8,8 @@ use DateTime;
 class File implements FileInterface
 {
     /** @var string */
+    protected $directory;
+    /** @var string */
     protected $extension;
     /** @var string */
     protected $filename;
@@ -21,8 +23,22 @@ class File implements FileInterface
     protected $path;
     /** @var int */
     protected $size;
+    /** @var string */
+    protected $systemFilename;
     /** @var DateTime */
     protected $uploadedAt;
+
+    public function getDirectory(): string
+    {
+        return $this->directory;
+    }
+
+    public function setDirectory(string $directory): self
+    {
+        $this->directory = $directory;
+
+        return $this;
+    }
 
     public function getExtension(): string
     {
@@ -104,6 +120,18 @@ class File implements FileInterface
     public function setSize(int $size): self
     {
         $this->size = $size;
+
+        return $this;
+    }
+
+    public function getSystemFilename(): string
+    {
+        return $this->systemFilename;
+    }
+
+    public function setSystemFilename(string $systemFilename): self
+    {
+        $this->systemFilename = $systemFilename;
 
         return $this;
     }

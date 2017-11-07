@@ -37,12 +37,14 @@ class UploadResolver
 
         return $properties +
             [
-                'extension'  => $fileParts['extension'],
-                'filename'   => $filename,
-                'label'      => $fileParts['basename'],
-                'mimeType'   => $uploadedFile->getClientMediaType(),
-                'path'       => $fileParts['dirname'],
-                'size'       => $uploadedFile->getSize(),
+                'directory'      => $fileParts['dirname'],
+                'extension'      => $fileParts['extension'],
+                'filename'       => $uploadedFile->getClientFilename(),
+                'label'          => $fileParts['basename'],
+                'mimeType'       => $uploadedFile->getClientMediaType(),
+                'path'           => $fileParts['dirname'],
+                'size'           => $uploadedFile->getSize(),
+                'systemFilename' => $filename,
             ];
     }
 
@@ -64,13 +66,15 @@ class UploadResolver
 
         $fileParts = pathinfo($uploadedFile->getClientFilename());
         $file = (new File())
+            ->setDirectory($fileParts['dirname'])
             ->setExtension($fileParts['extension'])
             ->setFilename($uploadedFile->getClientFilename())
-            ->setLabel(($uploadedFile->getClientFilename()))
+            ->setLabel($uploadedFile->getClientFilename())
             ->setId($id)
             ->setMimeType($uploadedFile->getClientMediaType())
-            ->setPath($fileParts['dirname'])
+            ->setPath($fileParts['dirname'] . $filename)
             ->setSize($uploadedFile->getSize())
+            ->setSystemFilename($filename)
             ->setUploadedAt(new DateTime());
 
         return $file;
