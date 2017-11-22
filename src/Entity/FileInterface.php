@@ -7,29 +7,19 @@ use DateTime;
 
 interface FileInterface
 {
-    public function getFileName(): string;
+    public function getExtension(): string;
 
-    public function setFileName(string $fileName);
+    public function getFileName(): string;
 
     public function getId(): string;
 
-    public function getPath(): string;
-
-    public function setPath(string $path);
-
     public function getMimeType(): string;
 
-    public function setMimeType(string $mimeType);
-
-    public function getUploadedAt(): DateTime;
-
-    public function setUploadedAt(DateTime $uploadedAt);
+    public function getPath(): string;
 
     public function getSize(): int;
 
-    public function setSize(int $size);
+    public function getSystemFilename(): string;
 
-    public function getExtension(): string;
-
-    public function setExtension(string $extension);
+    public function getUploadedAt(): DateTime;
 }
