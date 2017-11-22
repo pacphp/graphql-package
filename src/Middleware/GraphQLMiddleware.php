@@ -6,9 +6,10 @@ namespace Pac\GraphQL\Middleware;
 use Exception;
 use Interop\Http\Server\MiddlewareInterface;
 use Interop\Http\Server\RequestHandlerInterface;
+use Pac\GraphQL\Interactor\Processor;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Youshido\GraphQL\Execution\Processor;
 use Youshido\GraphQL\Schema\AbstractSchema;
 use Zend\Diactoros\Response\JsonResponse;
 
@@ -33,27 +34,12 @@ class GraphQLMiddleware implements MiddlewareInterface
      * Process an incoming server request and return a response, optionally delegating
      * to the next middleware component to create the response.
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler)
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
-            $content = $this->extractContentFromRequest($request);
+            $processor = new Processor($this->schema, $this->contextServices, $this->logger);
 
-            if ($this->logger && $this->debug) {
-                $this->logger->info('GraphQL');
-                $this->logger->info('=======');
-                $this->logger->info('Query');
-                $this->logger->info(json_encode($content['query']));
-                $this->logger->info('Variables');
-                $this->logger->info(json_encode($content['variables']));
-                $this->logger->info('=======');
-            }
-
-            $processor = new Processor($this->schema);
-            $this->injectServicesInContext($processor);
-            $result = $processor
-                ->processPayload($content['query'], $content['variables'])
-                ->getResponseData();
-
+            return $processor->processPayload($request);
         } catch (Exception $e) {
             $result = [
                 'error' => [
@@ -63,37 +49,8 @@ class GraphQLMiddleware implements MiddlewareInterface
             if ($this->logger) {
                 $this->logger->error($e->getMessage());
             }
-        }
 
-        $response = new JsonResponse($result);
-
-        return $response;
-    }
-
-    protected function extractContentFromRequest(ServerRequestInterface $request): array
-    {
-        if (!$content = json_decode($request->getBody()->getContents(), true)) {
-            $content = $request->getParsedBody();
-            foreach ($content as $key => $json) {
-                $content[$key] = json_decode($json, true);
-            }
-            $content['variables'] += $request->getUploadedFiles();
-        }
-
-        $content += [
-            'query'     => null,
-            'variables' => null,
-        ];
-
-        return $content;
-    }
-
-    protected function injectServicesInContext(Processor $processor)
-    {
-        $container = $processor->getExecutionContext()->getContainer();
-        foreach ($this->contextServices as $id => $service) {
-            $container->set($id, $service);
+            return new JsonResponse($result);
         }
     }
-
 }
