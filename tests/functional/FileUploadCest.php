@@ -6,7 +6,6 @@ namespace Test\Functional;
 use FunctionalTester;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Memory\MemoryAdapter;
-use Oscar\GraphQL\Field\PingField;
 use Pac\GraphQL\Interactor\Uploader;
 use Pac\GraphQL\Interactor\UploadResolver;
 use Pac\GraphQL\Mutation\UploadFileMutation;
